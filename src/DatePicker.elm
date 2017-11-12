@@ -402,7 +402,17 @@ view pickedDate settings (DatePicker ({ open } as model)) =
             [ ( settings.classNamespace ++ "input", True ) ]
                 ++ settings.inputClassList
 
-        inputCommon xs =
+        potentialInputValueAttr =
+            case open of
+                True ->
+                    []
+                False ->
+                    [ Maybe.map settings.dateFormatter pickedDate
+                        |> Maybe.withDefault ""
+                        |> value
+                    ]
+
+        dateInput =
             input
                 ([ Attrs.classList inputClasses
                  , Attrs.name (settings.inputName ?> "")
@@ -411,21 +421,13 @@ view pickedDate settings (DatePicker ({ open } as model)) =
                  , onBlur Blur
                  , onClick Focus
                  , onFocus Focus
+                 , placeholder settings.placeholder
                  ]
                     ++ settings.inputAttributes
                     ++ potentialInputId
-                    ++ xs
+                    ++ potentialInputValueAttr
                 )
                 []
-
-        dateInput =
-            inputCommon
-                [ placeholder settings.placeholder
-                , (Maybe.map settings.dateFormatter pickedDate
-                    |> Maybe.withDefault ""
-                  )
-                    |> value
-                ]
     in
         div [ class "container" ]
             [ dateInput
